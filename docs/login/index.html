@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>登录 · 暗岩秘典</title>
+<meta name="description" content="登录暗岩秘典">
+<meta property="og:title" content="登录 · 暗岩秘典"><meta property="og:description" content="登录暗岩秘典">
+<meta property="og:image" content="../img/hero-bell.jpg"><meta name="theme-color" content="#07090a">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../fonts/tome.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../css/tome.css">
+<meta name="tome-root" content="../">
+<meta name="robots" content="noindex">
+
+</head><body>
+<header class="nav"><div class="wrap">
+ <a class="brand" href="../"><span class="sigil"><i></i></span><span class="gold">暗岩秘典</span></a>
+ <ul>
+  <li><a href="../" class="">首页</a></li>
+  <li><a href="../juan/0/" class="">免费第一课</a></li>
+  <li><a href="../juan/" class="">秘典目录</a></li>
+  <li><a href="../forge/" class="">外包与合作</a></li>
+  <li><a href="../join/" class="">入会</a></li>
+ </ul>
+ <a class="join" href="../join/">开启秘典</a>
+ <button class="burger" aria-label="菜单">☰</button>
+</div></header>
+<main><section class="authwrap"><div class="wrap">
+  <form id="auth" class="authbox parch" data-mode="login" autocomplete="on"><i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+   <div class="seal">典</div>
+   <div class="tabs"><button type="button" class="on" data-mode="login">登录</button><button type="button" data-mode="register">注册</button></div>
+   <label>邮箱<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+   <label>密码<input name="password" type="password" required minlength="8" autocomplete="current-password" placeholder="至少 8 位"></label>
+   <label class="pw2" hidden>再输一次密码<input name="password2" type="password" minlength="8" autocomplete="new-password"></label>
+   <button class="btn" type="submit">登录</button>
+   <p class="hint">忘记密码请联系作者重置。登录即表示同意购买 7 天内、进度不到 20% 可退款的规则。</p>
+  </form>
+ </div></section></main>
+<footer><div class="wrap">
+ <span>暗岩秘典 · Rhett · 《暗岩传说：深渊回响》开发全录</span>
+ <nav><a href="../join/#faq">退款说明</a><a href="../forge/#contact">联系</a></nav>
+</div></footer>
+<script src="../js/tome.js" defer></script>
+
+<script src="../js/member.js" defer></script>
+</body></html>

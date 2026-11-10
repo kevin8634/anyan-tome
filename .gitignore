@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+docs/**/_shot.html
+server/.env
+data/
+media/**/enc.key
+media/**/*.ts
+media/**/*.m3u8
