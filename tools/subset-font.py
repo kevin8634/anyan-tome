@@ -4,6 +4,7 @@ import sys, glob, pathlib
 from fontTools import subset
 root = pathlib.Path(__file__).resolve().parent.parent
 text = ''.join(p.read_text('utf-8') for p in list(root.glob('docs/**/*.html')) + list(root.glob('src/*.mjs')) + list(root.glob('static/js/*.js')))
+text += ''.join(l for p in root.glob('course/**/*.md') for l in p.read_text('utf-8').splitlines(True) if l.startswith('#'))  # 讲义标题用衬线字，正文用系统黑体
 chars = set(text) | set('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ¥·—…「」『』《》，。、：；！？（）')
 opts = subset.Options(); opts.flavor = 'woff2'; opts.layout_features = ['*']; opts.name_IDs = ['*']
 f = subset.load_font(sys.argv[1], opts)

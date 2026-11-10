@@ -75,6 +75,17 @@ WantedBy=multi-user.target
 ```
 6. 备份：每天把 `data/tome.db` 拷一份走（SQLite 单文件）
 
+## 静态版会员（现在在用：GitHub Pages + 微信收款码 + 解锁码，不需要服务器）
+
+- 买家点购买 → 弹出微信收款码，按页面价格付款，备注写微信号或邮箱 → 你核对到账后用**发码器**生成专属解锁码发给他 → 他在入会页 `join/#unlock` 或卷页侧栏输入就能看。
+- 付费正文写在 `course/<卷>/<节>.md`（**不进 Git**），构建时用总钥加密成 `docs/locked/<卷>/<节>.json`；卷〇（免费）写明文。只有卷的 `status` 是 `open` 才会发布，筹备中的卷不会上线。
+- 视频：`tools/pack-locked.sh 视频.mp4 卷 节` 切片加密到 `static/locked/`，再在讲义里单独一行写 `[[视频]]`。
+- 总钥 `keys/master.key` 和网页版发码器 `keys/发码器.html` **不进 Git**，务必另存备份；总钥丢了，已发的码全部失效。
+- 发码：`npm run code full "备注"`（亲授 `mentor`，单卷 `1`–`5`），或双击 `keys/发码器.html`（`npm run code html` 生成）。
+- 有人外传解锁码：`npm run code revoke <码或编号>`，重新构建推送后，这个码就不能再解锁新设备。
+- 限制：解锁码可以转给别人用（只能事后拉黑）；已解锁的人能自己录屏或保存正文。这是不用服务器的代价，以后上服务器可切回会员后端。
+- 构建并推送：`tools/publish.sh "说明"`（会检查 course/、keys/ 没有进仓库）。
+
 ## 早鸟阶梯价
 
 全卷价在 `src/data.mjs` 的 `ladder` 里：起价 ¥199，每把一卷付费卷的 `status` 改成 `open`，全卷自动涨 ¥50，封顶 ¥299；亲授 = 全卷 + ¥100；单卷 ¥99。
