@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync, cpSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { site, stats, pricing, volumes, services, faq, prices, ladder } from './data.mjs';
+import { lockAll } from '../tools/lock.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'docs');
@@ -10,6 +11,7 @@ rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 cpSync(join(ROOT, 'static'), OUT, { recursive: true });
 writeFileSync(join(OUT, '.nojekyll'), '');
+const { avail, locked } = await lockAll(ROOT, OUT, volumes);
 writeFileSync(join(OUT, 'prices.json'), JSON.stringify({ single: prices.single.toFixed(2), full: prices.full.toFixed(2), mentor: prices.mentor.toFixed(2) }));
 
 const NUM = ['壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖', '拾'];
@@ -20,7 +22,7 @@ const payBtn = (id, label, r, cls = 'btn', vol) =>
   `<a class="${cls}" href="${r}join/#open" data-buy="${id}"${vol ? ` data-vol="${vol}"` : ''}${site.pay[id] ? ` data-fallback="${esc(site.pay[id])}"` : ''}>${label}</a>`;
 const realLessons = v => v.lessons.filter(l => !l.more).length + (v.lessons.find(l => l.more) ? 10 : 0);
 
-function page({ path, title, desc, active, body, r, data = false, noindex = false }) {
+function page({ path, title, desc, active, body, r, data = false, noindex = false, hls = false }) {
   const html = `<!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -32,6 +34,7 @@ function page({ path, title, desc, active, body, r, data = false, noindex = fals
 <link rel="preload" href="${r}fonts/tome.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${r}css/tome.css">
 <meta name="tome-root" content="${r}">${noindex ? '\n<meta name="robots" content="noindex">' : ''}
+<script>window.TOME_OPEN=${JSON.stringify(volumes.filter(v => !v.free && v.status === 'open').map(v => v.no))}</script>
 ${data ? `<script>window.TOME=${JSON.stringify({ name: site.name, volumes })}</script>` : ''}
 </head><body data-prices='${JSON.stringify({ single: prices.single, full: prices.full, mentor: prices.mentor })}'>
 <header class="nav"><div class="wrap">
@@ -52,7 +55,9 @@ ${data ? `<script>window.TOME=${JSON.stringify({ name: site.name, volumes })}</s
  <nav><a href="${r}join/#faq">退款说明</a><a href="${r}forge/#contact">联系</a>${site.icp ? `<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">${esc(site.icp)}</a>` : ''}</nav>
 </div></footer>
 <script src="${r}js/tome.js" defer></script>
-${active === 'learn' ? `<script src="${r}js/vendor/hls.light.min.js" defer></script>` : ''}
+${active === 'learn' || hls ? `<script src="${r}js/vendor/hls.light.min.js" defer></script>` : ''}
+<script src="${r}js/tomecode.js" defer></script>
+<script src="${r}js/unlock.js" defer></script>
 <script src="${r}js/member.js" defer></script>
 </body></html>`;
   const file = join(OUT, path, 'index.html');
@@ -121,7 +126,7 @@ const tiers = (r) => `<div class="prices">${pricing.map(t => `<div class="tier r
 <section id="price" style="padding-top:70px"><div class="wrap">
  ${head('入会方式', '择一而入')}
  ${tiers(r)}
- <p class="note">购买 7 天内、学习进度不到 20%，可全额退款。</p>
+ <p class="note">购买 7 天内联系作者可全额退款，解锁码同时停用。</p>
 </div></section>
 
 <section style="padding-top:60px"><div class="wrap">
@@ -181,7 +186,8 @@ for (const v of volumes) {
   const hasVideo = v.lessons.some(l => l.video);
   const syll = v.lessons.map((l, i) => {
     if (l.more) return `<li class="more"><em>${NUM[i]}+</em><b>${l.t}</b><s>入会可见</s></li>`;
-    const tag = l.video ? '<s class="f">免费 · 播放</s>' : l.free ? '<s class="f">免费 · 录制中</s>' : v.status === 'open' ? '<s>会员</s>' : '<s>筹备中</s>';
+    const has = avail[v.no]?.[i + 1];
+    const tag = l.video ? '<s class="f">免费 · 播放</s>' : l.free ? (has ? '<s class="f">免费 · 讲义</s>' : '<s class="f">免费 · 录制中</s>') : v.status === 'open' ? (has ? '<s>会员</s>' : '<s>会员 · 编写中</s>') : '<s>筹备中</s>';
     return `<li data-l="${i + 1}" class="${l.video ? 'playable' : ''}" ${l.video ? 'data-play' : ''}><em>第${NUM[i]}节</em><b>${l.t}</b>${tag}</li>`;
   }).join('');
   const aside = v.free
@@ -190,10 +196,11 @@ for (const v of volumes) {
         <a class="btn" href="${r}juan/1/">看下一卷</a><div class="or">或 <a href="${r}join/">直接开启全卷秘典</a></div></div>`
     : `<div class="aside rv"><h4>解锁卷${v.cn}</h4><div class="p">¥99<small>/ 本卷</small></div>
         <p class="dim" style="margin-top:12px;font-size:15px">${v.status === 'open' ? '永久可看，含本卷全部附件。' : '本卷筹备中。现在入会，开卷当天即可看。'}</p>
-        ${payBtn('single', '单买本卷', r, 'btn', v.no)}<div class="or">或 <a href="${r}join/">¥${prices.full} ${prices.capped ? '' : '早鸟'}开启全卷</a></div></div>`;
+        ${payBtn('single', '单买本卷', r, 'btn', v.no)}<div class="or">或 <a href="${r}join/">¥${prices.full} ${prices.capped ? '' : '早鸟'}开启全卷</a></div>
+        <form class="unlock"><input name="code" required placeholder="已付款？输入解锁码" autocomplete="off"><button class="btn ghost" type="submit">解锁</button></form></div>`;
   page({
     path: `juan/${v.slug}`, r, active: v.free ? 'free' : 'juan',
-    title: `卷${v.cn} ${v.title} · ${site.name}`, desc: v.tagline,
+    title: `卷${v.cn} ${v.title} · ${site.name}`, desc: v.tagline, hls: Object.values(avail[v.no] || {}).some(x => x.video),
     body: `<div class="vhero"><div class="bg" style="background-image:url(${r}img/${v.img}.jpg)"></div><div class="wrap">
   <div class="crumb"><a href="${r}">首页</a> ／ <a href="${r}juan/">秘典目录</a> ／ 卷${v.cn}</div>
   <div class="num">卷 ${v.cn} · 第 ${v.no + 1} 期</div><h1>${v.title}</h1><p>${v.intro}</p>
@@ -203,7 +210,8 @@ for (const v of volumes) {
   <div>
    ${hasVideo ? `<div class="vplayer rv">${player(r)}</div>` : ''}
    <h3>学完这一卷</h3><ul class="gains">${v.gains.map(g => `<li>${g}</li>`).join('')}</ul>
-   <h3>本卷章节</h3><ol class="syll" data-vol="${v.no}">${syll}</ol>
+   <h3>本卷章节</h3><ol class="syll" data-vol="${v.no}" data-free="${v.free ? 1 : 0}" data-avail='${JSON.stringify(avail[v.no] || {})}'>${syll}</ol>
+   <div class="reader frame" id="reader" hidden></div>
    <div class="vnav">${prev ? `<a href="${r}juan/${prev.slug}/"><small>上一卷</small>卷${prev.cn} ${prev.title}</a>` : '<span></span>'}${next ? `<a href="${r}juan/${next.slug}/" style="text-align:right"><small>下一卷</small>卷${next.cn} ${next.title}</a>` : '<span></span>'}</div>
   </div>
   ${aside}
@@ -259,9 +267,15 @@ for (const v of volumes) {
   ${open ? '' : '<div class="notice" id="open">收款通道正在开通，开放当天会在这里和各平台主页同步通知。先去看免费的卷〇吧。</div>'}
   <div class="flow">
    <div class="step rv"><h4>看卷〇</h4><p>免费，不用登录，先确认适合你。</p></div>
-   <div class="step rv"><h4>选方案</h4><p>单卷或全卷，微信扫码或去爱发电付款。</p></div>
-   <div class="step rv"><h4>开通</h4><p>爱发电付款自动开通；微信扫码由作者核对到账后开通，一般当天内。</p></div>
-   <div class="step rv"><h4>开卷就看</h4><p>新卷开放当天，会员直接可看。</p></div>
+   <div class="step rv"><h4>扫码付款</h4><p>选单卷或全卷，微信扫码付款，备注写你的微信号或邮箱。</p></div>
+   <div class="step rv"><h4>收解锁码</h4><p>作者核对到账后把专属解锁码发给你，一般当天内。</p></div>
+   <div class="step rv"><h4>输码就看</h4><p>在下面输入解锁码。全卷码以后开放的新卷也能直接看。</p></div>
+  </div>
+  <div class="unlockbox parch rv" id="unlock">
+   <h3>输入解锁码</h3>
+   <form class="unlock"><input name="code" required placeholder="AY-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off"><button class="btn" type="submit">解锁</button></form>
+   <p class="hint">解锁码保存在这台设备的浏览器里，换手机或电脑时再输一次即可。码是你专属的，外传会被停用。</p>
+   <p class="hint" id="mycodes"></p>
   </div>
  </div></section>
  <section id="faq" style="padding-top:40px"><div class="wrap">

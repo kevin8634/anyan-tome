@@ -63,7 +63,8 @@
     modal(`<div class="kicker">微信扫码付款</div><h3>${label(product, vol)}</h3>
       <img class="qr" src="${R}img/wechat-pay.webp" alt="微信收款码">
       <div class="amt">请付 <b>¥${PRICE[product]}</b></div>
-      <p class="dim">付款时在<b>备注里写你的邮箱</b>${vol ? '和「卷' + CN[vol] + '」' : ''}。会员系统上线后，作者会把兑换码发到这个邮箱。</p>`);
+      <p class="dim">付款时在<b>备注里写你的微信号或邮箱</b>${vol ? '，并注明「卷' + CN[vol] + '」' : ''}。作者核对到账后把<b>专属解锁码</b>发给你，一般当天内。</p>
+      <p class="hint">收到解锁码后，到 <a href="${R}join/#unlock">入会页</a> 输入即可。</p>`);
   }
   async function pay(product, vol, method) {
     const j = await api('orders', { product, vol, method });

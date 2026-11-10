@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>暗岩秘典 · 发码器</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b0d0e;color:#e2d6b8;font:16px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:36px 22px 80px}
+h1{margin:0 0 4px;font-size:26px;letter-spacing:4px;color:#e6c67a}.sub{color:#9b8f74;font-size:14px;margin-bottom:26px}
+.card{background:#14181a;border:1px solid #3a3222;border-radius:12px;padding:22px;margin-bottom:20px}
+label{display:block;font-size:13px;color:#9b8f74;margin:0 0 6px}
+select,input,textarea{width:100%;background:#0b0d0e;color:#efe3c4;border:1px solid #4a3f2a;border-radius:8px;padding:11px 12px;font:inherit}
+.row{display:grid;grid-template-columns:200px 1fr;gap:14px}.row>div{min-width:0}
+button{background:linear-gradient(#d8b46a,#a8823e);color:#1a1206;border:0;border-radius:8px;padding:12px 22px;font:600 16px/1 inherit;cursor:pointer;letter-spacing:2px}
+button.ghost{background:none;border:1px solid #6a5a38;color:#d8c49a;font-weight:400;padding:9px 14px;font-size:14px;letter-spacing:0}
+.code{font:600 22px/1.4 ui-monospace,Menlo,Consolas,monospace;color:#9ff0c4;letter-spacing:1px;word-break:break-all;margin:6px 0 12px}
+textarea{height:110px;font-size:14px;resize:vertical}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid #2a251a;vertical-align:top}
+td code{font-family:ui-monospace,Menlo,Consolas,monospace;color:#cfe9d9;font-size:12px}
+.warn{color:#e2a36a;font-size:13px}.ok{color:#9ff0c4;font-size:13px}.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<h1>暗岩秘典 · 发码器</h1>
+<div class="sub">只在你自己的电脑上用。这个文件里有总钥，不要上传、不要发给任何人。</div>
+
+<div class="card">
+ <div class="row">
+  <div><label>方案</label><select id="type">
+   <option value="15">全卷秘典</option><option value="31">秘典 · 亲授</option>
+   <option value="1">单卷 · 卷一</option><option value="2">单卷 · 卷二</option><option value="3">单卷 · 卷三</option><option value="4">单卷 · 卷四</option><option value="5">单卷 · 卷五</option>
+  </select></div>
+  <div><label>备注（买家微信号或邮箱、付款金额，方便以后查）</label><input id="note" placeholder="例：微信 abc123 · ¥199 · 11月12日"></div>
+ </div>
+ <div style="margin-top:16px"><button id="go">生成解锁码</button></div>
+</div>
+
+<div class="card" id="out" hidden>
+ <label>解锁码</label><div class="code" id="code"></div>
+ <label>发给买家的话（可以直接复制）</label><textarea id="msg"></textarea>
+ <div class="flex" style="margin-top:10px"><button class="ghost" id="copyCode">复制解锁码</button><button class="ghost" id="copyMsg">复制整段话</button><span class="ok" id="tip"></span></div>
+</div>
+
+<div class="card">
+ <div class="flex" style="justify-content:space-between;margin-bottom:10px"><b>发码记录</b><span class="flex"><button class="ghost" id="csv">导出表格</button></span></div>
+ <table><thead><tr><th>时间</th><th>编号</th><th>方案</th><th>解锁码</th><th>备注</th></tr></thead><tbody id="list"></tbody></table>
+ <p class="warn">记录只保存在这个浏览器里，换电脑或清缓存会丢，记得定期导出。发现有人把码外传：把那一行的「编号」发给 Hark，拉黑后重新发布就失效了。</p>
+</div>
+</div>
+<script>/*CORE*/</script>
+<script>
+const T = TomeCode, M = T.unhex('__MASTER__'), SITE = 'https://kevin8634.github.io/anyan-tome/';
+const $ = s => document.querySelector(s), KEY = 'tome_issued';
+const load = () => JSON.parse(localStorage.getItem(KEY) || '[]');
+function render() {
+  $('#list').innerHTML = load().slice().reverse().map(r => `<tr><td>${r.t}</td><td>${r.id}</td><td>${r.name}</td><td><code>${r.code}</code></td><td>${(r.note || '').replace(/</g, '&lt;')}</td></tr>`).join('') || '<tr><td colspan="5" style="color:#776c55">还没有发过码</td></tr>';
+}
+$('#go').onclick = () => {
+  const type = +$('#type').value, serial = crypto.getRandomValues(new Uint16Array(1))[0];
+  const code = T.make(M, type, serial), p = T.parse(code);
+  const rows = load(); rows.push({ t: new Date().toLocaleString('zh-CN', { hour12: false }), id: p.id, name: p.name, code, note: $('#note').value.trim() });
+  localStorage.setItem(KEY, JSON.stringify(rows));
+  $('#code').textContent = code; $('#out').hidden = false; $('#tip').textContent = '';
+  $('#msg').value = `你好，收到你的付款，谢谢支持暗岩秘典！\n你的方案：${p.name}\n解锁码：${code}\n打开 ${SITE}join/#unlock ，把解锁码粘贴进去就能看。换手机或电脑时再输一次即可。\n这个码是你专属的，请不要转给别人。`;
+  $('#note').value = ''; render();
+};
+const copy = (t, w) => navigator.clipboard.writeText(t).then(() => $('#tip').textContent = `已复制${w}`, () => { $('#msg').select(); $('#tip').textContent = '请按 Ctrl+C 复制'; });
+$('#copyCode').onclick = () => copy($('#code').textContent, '解锁码');
+$('#copyMsg').onclick = () => copy($('#msg').value, '整段话');
+$('#csv').onclick = () => {
+  const q = s => `"${String(s ?? '').replace(/"/g, '""')}"`;
+  const csv = '\ufeff时间,编号,方案,解锁码,备注\n' + load().map(r => [r.t, r.id, r.name, r.code, r.note].map(q).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = '暗岩秘典_发码记录.csv'; a.click();
+};
+render();
+</script></body></html>

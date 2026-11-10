@@ -6,3 +6,6 @@ data/
 media/**/enc.key
 media/**/*.ts
 media/**/*.m3u8
+# 付费课程明文与总钥：只留本地，绝不提交
+course/
+keys/

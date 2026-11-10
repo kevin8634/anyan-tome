@@ -386,3 +386,33 @@ form.stack{display:grid;gap:12px}form.stack input{margin:0}form.stack .btn{justi
 .paybox b{color:#2a1c0e}.paybox code{color:#6a3a12}
 .paybox .x{color:#6a5236}
 .paybox .qr{width:min(230px,62vw)}
+
+.paybox a{color:#6a3a12;text-decoration:underline}
+/* 解锁 */
+form.unlock{display:flex;gap:8px;margin-top:16px}
+form.unlock input{flex:1;min-width:0;background:rgba(0,0,0,.35);border:1px solid rgba(200,160,80,.35);color:var(--bone);border-radius:6px;padding:10px 12px;font:14px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.5px}
+form.unlock .btn{padding:10px 16px;white-space:nowrap}
+.unlockbox{max-width:720px;margin:56px auto 0;padding:34px 34px 26px;text-align:center;color:#3a2a16}
+.unlockbox h3{font-size:24px;letter-spacing:6px;color:#2a1c0e}
+.unlockbox form.unlock input{background:rgba(255,250,235,.7);color:#2a1c0e;border-color:rgba(90,60,20,.4)}
+.unlockbox .hint{font-size:13px;color:#5a4630;margin-top:12px}.unlockbox .hint a{color:#7a1f12}
+/* 阅读器 */
+.syll li.on{background:rgba(200,160,80,.1)}
+.reader{margin-top:28px;padding:34px 38px;scroll-margin-top:90px}
+.reader .rhead{border-bottom:1px solid rgba(200,160,80,.25);padding-bottom:14px;margin-bottom:22px}
+.reader .rhead span{display:block;font-size:13px;letter-spacing:3px;color:var(--gold2)}
+.reader .rhead b{font-size:26px;color:#f0dfb0;letter-spacing:2px}
+.lesson{font-size:17px;line-height:1.95;color:var(--bone)}
+.lesson h2{font-size:22px;color:#f0dfb0;margin:34px 0 12px;letter-spacing:2px}.lesson h3{font-size:19px;color:var(--gold);margin:26px 0 10px}
+.lesson p{margin:0 0 16px}.lesson ul,.lesson ol{margin:0 0 16px;padding-left:1.4em}.lesson li{margin:4px 0}
+.lesson b{color:#f3e2b4}.lesson a{color:var(--jade,#9ff0c4)}
+.lesson code{font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;background:rgba(0,0,0,.4);padding:1px 6px;border-radius:4px;color:#cfe9d9}
+.lesson pre{background:#080a0b;border:1px solid rgba(200,160,80,.2);border-radius:8px;padding:16px 18px;overflow:auto;margin:0 0 18px}
+.lesson pre code{background:none;padding:0;font-size:13.5px;line-height:1.65;white-space:pre}
+.lesson blockquote{margin:0 0 18px;padding:12px 18px;border-left:3px solid var(--gold);background:rgba(200,160,80,.07);color:#e9dcbc}
+.lesson table{width:100%;border-collapse:collapse;margin:0 0 18px;font-size:15px}.lesson th,.lesson td{border-bottom:1px solid rgba(200,160,80,.2);padding:8px 10px;text-align:left;vertical-align:top}
+.lesson th{color:var(--gold)}.lesson hr{border:0;border-top:1px solid rgba(200,160,80,.2);margin:28px 0}
+.lesson img{max-width:100%;border-radius:8px}
+.lesson .lvid video{width:100%;border-radius:8px;background:#000}.lesson .vsoon{color:var(--gold2);font-size:14px;border:1px dashed rgba(200,160,80,.35);padding:10px 14px;border-radius:6px}
+.reader .rnav{display:flex;justify-content:space-between;margin-top:30px;border-top:1px solid rgba(200,160,80,.2);padding-top:16px}.reader .rnav a{color:var(--gold)}
+@media(max-width:700px){.reader{padding:24px 18px}.lesson{font-size:16px}}

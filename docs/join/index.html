@@ -9,6 +9,7 @@
 <link rel="preload" href="../fonts/tome.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../css/tome.css">
 <meta name="tome-root" content="../">
+<script>window.TOME_OPEN=[]</script>
 
 </head><body data-prices='{"single":99,"full":199,"mentor":299}'>
 <header class="nav"><div class="wrap">
@@ -38,14 +39,20 @@
   
   <div class="flow">
    <div class="step rv"><h4>看卷〇</h4><p>免费，不用登录，先确认适合你。</p></div>
-   <div class="step rv"><h4>选方案</h4><p>单卷或全卷，微信扫码或去爱发电付款。</p></div>
-   <div class="step rv"><h4>开通</h4><p>爱发电付款自动开通；微信扫码由作者核对到账后开通，一般当天内。</p></div>
-   <div class="step rv"><h4>开卷就看</h4><p>新卷开放当天，会员直接可看。</p></div>
+   <div class="step rv"><h4>扫码付款</h4><p>选单卷或全卷，微信扫码付款，备注写你的微信号或邮箱。</p></div>
+   <div class="step rv"><h4>收解锁码</h4><p>作者核对到账后把专属解锁码发给你，一般当天内。</p></div>
+   <div class="step rv"><h4>输码就看</h4><p>在下面输入解锁码。全卷码以后开放的新卷也能直接看。</p></div>
+  </div>
+  <div class="unlockbox parch rv" id="unlock">
+   <h3>输入解锁码</h3>
+   <form class="unlock"><input name="code" required placeholder="AY-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off"><button class="btn" type="submit">解锁</button></form>
+   <p class="hint">解锁码保存在这台设备的浏览器里，换手机或电脑时再输一次即可。码是你专属的，外传会被停用。</p>
+   <p class="hint" id="mycodes"></p>
   </div>
  </div></section>
  <section id="faq" style="padding-top:40px"><div class="wrap">
   <div class="head rv"><div class="kicker">答疑</div><h2>入卷之前</h2><div class="rule"></div></div>
-  <div class="faq rv"><details><summary>没写过代码能学吗？</summary><p>能。卷〇 就是为零基础准备的，看完它再决定要不要入会。整套方法的核心是「把话说清楚、让 AI 做、自己验收」，不要求你会手写代码。</p></details><details><summary>要准备什么工具？</summary><p>一台能上网的电脑、一个 AI 编程工具。3D 生成工具按卷二的说明开通，费用在课里写明，可以先不买。</p></details><details><summary>买了能看多久？</summary><p>买下的卷永久可看，后续更新免费。</p></details><details><summary>能退款吗？</summary><p>购买 7 天内、学习进度不到 20%，可以全额退款。</p></details><details><summary>为什么课程分卷、分期开放？</summary><p>一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。现在买全卷，后续开放的每一卷都包含在内。全卷价每开放一卷涨 ¥50，涨到 ¥299 为止，越早买越便宜。</p></details></div>
+  <div class="faq rv"><details><summary>没写过代码能学吗？</summary><p>能。卷〇 就是为零基础准备的，看完它再决定要不要入会。整套方法的核心是「把话说清楚、让 AI 做、自己验收」，不要求你会手写代码。</p></details><details><summary>要准备什么工具？</summary><p>一台能上网的电脑、一个 AI 编程工具。3D 生成工具按卷二的说明开通，费用在课里写明，可以先不买。</p></details><details><summary>买了能看多久？</summary><p>买下的卷永久可看，后续更新免费。</p></details><details><summary>能退款吗？</summary><p>购买 7 天内联系作者，可以全额退款，退款后解锁码同时停用。</p></details><details><summary>为什么课程分卷、分期开放？</summary><p>一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。现在买全卷，后续开放的每一卷都包含在内。全卷价每开放一卷涨 ¥50，涨到 ¥299 为止，越早买越便宜。</p></details></div>
  </div></section></main>
 <footer><div class="wrap">
  <span>暗岩秘典 · Rhett · 《暗岩传说：深渊回响》开发全录</span>
@@ -53,5 +60,7 @@
 </div></footer>
 <script src="../js/tome.js" defer></script>
 
+<script src="../js/tomecode.js" defer></script>
+<script src="../js/unlock.js" defer></script>
 <script src="../js/member.js" defer></script>
 </body></html>
