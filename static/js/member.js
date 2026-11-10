@@ -41,7 +41,7 @@
     m.onclick = e => { if (e.target === m) { m.hidden = true; clearInterval(m._poll); } };
     return m;
   }
-  const PRICE = { single: '99', full: '199', mentor: '299' };
+  const PRICE = JSON.parse(document.body.dataset.prices || '{}');
   function showWechat(j, product, vol) {
     const m = modal(`<div class="kicker">微信扫码付款</div><h3>${label(product, vol)}</h3>
       <img class="qr" src="${R}${j.qr.replace(/^\//, '')}" alt="微信收款码">

@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync, cpSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { site, stats, pricing, volumes, services, faq } from './data.mjs';
+import { site, stats, pricing, volumes, services, faq, prices, ladder } from './data.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'docs');
@@ -10,6 +10,7 @@ rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 cpSync(join(ROOT, 'static'), OUT, { recursive: true });
 writeFileSync(join(OUT, '.nojekyll'), '');
+writeFileSync(join(OUT, 'prices.json'), JSON.stringify({ single: prices.single.toFixed(2), full: prices.full.toFixed(2), mentor: prices.mentor.toFixed(2) }));
 
 const NUM = ['壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖', '拾'];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -32,7 +33,7 @@ function page({ path, title, desc, active, body, r, data = false, noindex = fals
 <link rel="stylesheet" href="${r}css/tome.css">
 <meta name="tome-root" content="${r}">${noindex ? '\n<meta name="robots" content="noindex">' : ''}
 ${data ? `<script>window.TOME=${JSON.stringify({ name: site.name, volumes })}</script>` : ''}
-</head><body>
+</head><body data-prices='${JSON.stringify({ single: prices.single, full: prices.full, mentor: prices.mentor })}'>
 <header class="nav"><div class="wrap">
  <a class="brand" href="${r}"><span class="sigil"><i></i></span><span class="gold">${site.name}</span></a>
  <ul>
@@ -93,7 +94,7 @@ const tiers = (r) => `<div class="prices">${pricing.map(t => `<div class="tier r
   <div class="kicker">${site.game}开发全录</div>
   <h1>一个人，二十五天，<br>铸成一座深渊。</h1>
   <p class="lead">没有美术，没有外包。只靠 AI 和一套反复打磨的流程，做出一款打开浏览器就能玩的 3D RPG。这本秘典把每一步都拆开给你。</p>
-  <div class="ctas"><a class="btn" href="#free">免费看第一课</a><a class="btn ghost" href="${r}join/">开启秘典 · ¥199 起</a></div>
+  <div class="ctas"><a class="btn" href="#free">免费看第一课</a><a class="btn ghost" href="${r}join/">开启秘典 · ¥${prices.single} 起</a></div>
  </div>
  <div class="wrap stats">${stats.map(s => `<div><b>${s.n}</b><span>${s.t}</span></div>`).join('')}</div>
  <i class="scrollcue"></i>
@@ -112,7 +113,7 @@ const tiers = (r) => `<div class="prices">${pricing.map(t => `<div class="tier r
 </div></section>
 
 <section style="padding-top:40px"><div class="wrap">
- ${head('分期开卷', '秘典六卷', '一卷就是一期，录好一卷开放一卷。早鸟全卷会员，之后开放的每一期都包含在内。')}
+ ${head('分期开卷', '秘典六卷', '一卷就是一期，录好一卷开放一卷。全卷会员包含之后开放的每一期。全卷价每开一卷涨 ¥${ladder.step}，封顶 ¥${ladder.cap}。')}
  ${issues(r)}
  <div class="tomes">${volumes.map(v => volCard(v, r)).join('')}</div>
 </div></section>
@@ -189,7 +190,7 @@ for (const v of volumes) {
         <a class="btn" href="${r}juan/1/">看下一卷</a><div class="or">或 <a href="${r}join/">直接开启全卷秘典</a></div></div>`
     : `<div class="aside rv"><h4>解锁卷${v.cn}</h4><div class="p">¥99<small>/ 本卷</small></div>
         <p class="dim" style="margin-top:12px;font-size:15px">${v.status === 'open' ? '永久可看，含本卷全部附件。' : '本卷筹备中。现在入会，开卷当天即可看。'}</p>
-        ${payBtn('single', '单买本卷', r, 'btn', v.no)}<div class="or">或 <a href="${r}join/">¥199 早鸟开启全卷</a></div></div>`;
+        ${payBtn('single', '单买本卷', r, 'btn', v.no)}<div class="or">或 <a href="${r}join/">¥${prices.full} ${prices.capped ? '' : '早鸟'}开启全卷</a></div></div>`;
   page({
     path: `juan/${v.slug}`, r, active: v.free ? 'free' : 'juan',
     title: `卷${v.cn} ${v.title} · ${site.name}`, desc: v.tagline,
@@ -253,7 +254,7 @@ for (const v of volumes) {
   page({
     path: 'join', r, active: 'join', title: `入会 · ${site.name}`, desc: '暗岩秘典入会方式：单卷、全卷秘典、秘典亲授。',
     body: `<section style="padding-top:150px"><div class="wrap">
-  ${head('入会方式', '择一而入', '单买一卷，或一次开启全部六卷。早鸟价只给首批会员。')}
+  ${head('入会方式', '择一而入', '单买一卷，或一次开启全部六卷。全卷每开放一卷涨 ¥${ladder.step}，越早越便宜。')}
   ${tiers(r)}
   ${open ? '' : '<div class="notice" id="open">收款通道正在开通，开放当天会在这里和各平台主页同步通知。先去看免费的卷〇吧。</div>'}
   <div class="flow">

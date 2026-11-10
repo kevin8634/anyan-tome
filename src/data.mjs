@@ -34,11 +34,11 @@ export const pricing = [
     perks: ['任选一卷，永久可看', '该卷全部讲义、脚本与附件', '之后补全卷可抵扣已付'],
   },
   {
-    id: 'full', name: '全卷秘典', price: '¥199', unit: '/ 全部', was: '正价 ¥299', ribbon: '首批早鸟', main: true,
+    id: 'full', name: '全卷秘典', price: '', unit: '/ 全部', was: '', ribbon: '早鸟阶梯价', main: true,
     perks: ['卷一至卷五，开一卷看一卷', '模板库与后续更新', '会员答疑区'],
   },
   {
-    id: 'mentor', name: '秘典 · 亲授', price: '¥299', unit: '/ 全部', was: '',
+    id: 'mentor', name: '秘典 · 亲授', price: '', unit: '/ 全部', was: '',
     perks: ['全卷秘典全部权益', '一次 30 分钟项目诊断', '新卷抢先看'],
   },
 ];
@@ -142,5 +142,17 @@ export const faq = [
   { q: '要准备什么工具？', a: '一台能上网的电脑、一个 AI 编程工具。3D 生成工具按卷二的说明开通，费用在课里写明，可以先不买。' },
   { q: '买了能看多久？', a: '买下的卷永久可看，后续更新免费。' },
   { q: '能退款吗？', a: '购买 7 天内、学习进度不到 20%，可以全额退款。' },
-  { q: '为什么课程分卷、分期开放？', a: '一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。早鸟全卷会员，后续开放的每一卷都包含在内。' },
+  { q: '为什么课程分卷、分期开放？', a: '一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。现在买全卷，后续开放的每一卷都包含在内。全卷价每开放一卷涨 ¥50，涨到 ¥299 为止，越早买越便宜。' },
 ];
+
+// 早鸟阶梯价：每开放一卷付费卷，全卷涨 ladder.step，封顶 ladder.cap；亲授 = 全卷 + mentorPlus
+// 改这里或改卷的 status 后重新构建，价格会写进页面和 docs/prices.json（服务器以它为准，.env 的 PRICE_* 可覆盖）
+export const ladder = { start: 199, step: 50, cap: 299, mentorPlus: 100, single: 99 };
+const openedPaid = volumes.filter(v => !v.free && v.status === 'open').length;
+const fullNow = Math.min(ladder.start + ladder.step * openedPaid, ladder.cap);
+const fullNext = Math.min(fullNow + ladder.step, ladder.cap);
+export const prices = { single: ladder.single, full: fullNow, mentor: fullNow + ladder.mentorPlus, fullNext, capped: fullNow >= ladder.cap };
+for (const t of pricing) t.price = '¥' + prices[t.id];
+Object.assign(pricing.find(t => t.id === 'full'), prices.capped
+  ? { ribbon: '', was: '' }
+  : { was: `下一卷开放后 ¥${fullNext} · 正价 ¥${ladder.cap}` });

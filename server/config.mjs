@@ -13,6 +13,7 @@ if (existsSync(envFile)) {
   }
 }
 const e = (k, d = '') => process.env[k] ?? d;
+const BUILT = (() => { try { return JSON.parse(readFileSync(join(process.env.STATIC_DIR || join(ROOT, 'docs'), 'prices.json'), 'utf8')); } catch { return {}; } })();
 
 export const cfg = {
   port: +e('PORT', 8787),
@@ -38,8 +39,8 @@ export const cfg = {
   wechat: { enabled: e('WECHAT_PAY', '1') === '1', qr: e('WECHAT_QR', '/img/wechat-pay.webp'), name: e('WECHAT_NAME', '王磊-锐特 Rhett·AI 工坊') },
   // 能进 /admin/ 的账号（逗号分隔的邮箱），要先在站上注册
   adminEmails: e('ADMIN_EMAILS').split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
-  // 价格以服务器为准，不信前端。早鸟结束后把 PRICE_FULL 改成 299.00
-  prices: { single: e('PRICE_SINGLE', '99.00'), full: e('PRICE_FULL', '199.00'), mentor: e('PRICE_MENTOR', '299.00') },
+  // 价格以服务器为准，不信前端。默认读构建生成的 docs/prices.json（早鸟阶梯价，见 src/data.mjs 的 ladder），.env 的 PRICE_* 可覆盖
+  prices: { single: e('PRICE_SINGLE', BUILT.single || '99.00'), full: e('PRICE_FULL', BUILT.full || '199.00'), mentor: e('PRICE_MENTOR', BUILT.mentor || '299.00') },
 };
 
 if (!cfg.secret || cfg.secret.length < 32) {

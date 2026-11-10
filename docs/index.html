@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./css/tome.css">
 <meta name="tome-root" content="./">
 
-</head><body>
+</head><body data-prices='{"single":99,"full":199,"mentor":299}'>
 <header class="nav"><div class="wrap">
  <a class="brand" href="./"><span class="sigil"><i></i></span><span class="gold">暗岩秘典</span></a>
  <ul>
@@ -29,7 +29,7 @@
   <div class="kicker">《暗岩传说：深渊回响》开发全录</div>
   <h1>一个人，二十五天，<br>铸成一座深渊。</h1>
   <p class="lead">没有美术，没有外包。只靠 AI 和一套反复打磨的流程，做出一款打开浏览器就能玩的 3D RPG。这本秘典把每一步都拆开给你。</p>
-  <div class="ctas"><a class="btn" href="#free">免费看第一课</a><a class="btn ghost" href="./join/">开启秘典 · ¥199 起</a></div>
+  <div class="ctas"><a class="btn" href="#free">免费看第一课</a><a class="btn ghost" href="./join/">开启秘典 · ¥99 起</a></div>
  </div>
  <div class="wrap stats"><div><b>108,000</b><span>行代码</span></div><div><b>566</b><span>次提交</span></div><div><b>240</b><span>个 3D 模型</span></div><div><b>25</b><span>天</span></div><div><b>0</b><span>美术 · 外包</span></div></div>
  <i class="scrollcue"></i>
@@ -51,7 +51,7 @@
 </div></section>
 
 <section style="padding-top:40px"><div class="wrap">
- <div class="head rv"><div class="kicker">分期开卷</div><h2>秘典六卷</h2><div class="rule"></div><p>一卷就是一期，录好一卷开放一卷。早鸟全卷会员，之后开放的每一期都包含在内。</p></div>
+ <div class="head rv"><div class="kicker">分期开卷</div><h2>秘典六卷</h2><div class="rule"></div><p>一卷就是一期，录好一卷开放一卷。全卷会员包含之后开放的每一期。全卷价每开一卷涨 ¥${ladder.step}，封顶 ¥${ladder.cap}。</p></div>
  <div class="issues rv"><a class="issue open" href="./juan/0/">
   <div class="dot"></div><b>第 1 期</b><span>卷〇 · 起步</span><i>已开放</i></a><a class="issue soon" href="./juan/1/">
   <div class="dot"></div><b>第 2 期</b><span>卷一 · 指挥 AI 写十万行</span><i>筹备中</i></a><a class="issue soon" href="./juan/2/">
@@ -91,8 +91,8 @@
  <div class="prices"><div class="tier rv ">
   <h5>单卷</h5><div class="p">¥99<small>/ 卷</small></div><div class="was"></div>
   <ul><li>任选一卷，永久可看</li><li>该卷全部讲义、脚本与附件</li><li>之后补全卷可抵扣已付</li></ul>
-  <a class="btn ghost" href="./juan/">选择一卷</a></div><div class="tier rv main"><div class="ribbon">首批早鸟</div>
-  <h5>全卷秘典</h5><div class="p">¥199<small>/ 全部</small></div><div class="was">正价 ¥299</div>
+  <a class="btn ghost" href="./juan/">选择一卷</a></div><div class="tier rv main"><div class="ribbon">早鸟阶梯价</div>
+  <h5>全卷秘典</h5><div class="p">¥199<small>/ 全部</small></div><div class="was">下一卷开放后 ¥249 · 正价 ¥299</div>
   <ul><li>卷一至卷五，开一卷看一卷</li><li>模板库与后续更新</li><li>会员答疑区</li></ul>
   <a class="btn" href="./join/#open" data-buy="full">开启秘典</a></div><div class="tier rv ">
   <h5>秘典 · 亲授</h5><div class="p">¥299<small>/ 全部</small></div><div class="was"></div>
@@ -124,7 +124,7 @@
 
 <section id="faq" style="padding-top:60px"><div class="wrap">
  <div class="head rv"><div class="kicker">答疑</div><h2>入卷之前</h2><div class="rule"></div></div>
- <div class="faq rv"><details><summary>没写过代码能学吗？</summary><p>能。卷〇 就是为零基础准备的，看完它再决定要不要入会。整套方法的核心是「把话说清楚、让 AI 做、自己验收」，不要求你会手写代码。</p></details><details><summary>要准备什么工具？</summary><p>一台能上网的电脑、一个 AI 编程工具。3D 生成工具按卷二的说明开通，费用在课里写明，可以先不买。</p></details><details><summary>买了能看多久？</summary><p>买下的卷永久可看，后续更新免费。</p></details><details><summary>能退款吗？</summary><p>购买 7 天内、学习进度不到 20%，可以全额退款。</p></details><details><summary>为什么课程分卷、分期开放？</summary><p>一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。早鸟全卷会员，后续开放的每一卷都包含在内。</p></details></div>
+ <div class="faq rv"><details><summary>没写过代码能学吗？</summary><p>能。卷〇 就是为零基础准备的，看完它再决定要不要入会。整套方法的核心是「把话说清楚、让 AI 做、自己验收」，不要求你会手写代码。</p></details><details><summary>要准备什么工具？</summary><p>一台能上网的电脑、一个 AI 编程工具。3D 生成工具按卷二的说明开通，费用在课里写明，可以先不买。</p></details><details><summary>买了能看多久？</summary><p>买下的卷永久可看，后续更新免费。</p></details><details><summary>能退款吗？</summary><p>购买 7 天内、学习进度不到 20%，可以全额退款。</p></details><details><summary>为什么课程分卷、分期开放？</summary><p>一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。现在买全卷，后续开放的每一卷都包含在内。全卷价每开放一卷涨 ¥50，涨到 ¥299 为止，越早买越便宜。</p></details></div>
 </div></section>
 
 <section class="call"><div class="wrap rv">
