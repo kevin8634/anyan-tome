@@ -118,7 +118,7 @@ const tiers = (r) => `<div class="prices">${pricing.map(t => `<div class="tier r
 </div></section>
 
 <section style="padding-top:40px"><div class="wrap">
- ${head('分期开卷', '秘典六卷', '一卷就是一期，录好一卷开放一卷。全卷会员包含之后开放的每一期。全卷价每开一卷涨 ¥${ladder.step}，封顶 ¥${ladder.cap}。')}
+ ${head('分期开卷', '秘典七卷', '一卷就是一期，录好一卷开放一卷。全卷会员包含之后开放的每一期。全卷价每开一卷涨 ¥${ladder.step}，封顶 ¥${ladder.cap}。')}
  ${issues(r)}
  <div class="tomes">${volumes.map(v => volCard(v, r)).join('')}</div>
 </div></section>
@@ -166,9 +166,9 @@ const tiers = (r) => `<div class="prices">${pricing.map(t => `<div class="tier r
 {
   const r = '../';
   page({
-    path: 'juan', r, active: 'juan', title: `秘典目录 · ${site.name}`, desc: '暗岩秘典六卷分期课程目录。',
+    path: 'juan', r, active: 'juan', title: `秘典目录 · ${site.name}`, desc: '暗岩秘典七卷分期课程目录。',
     body: `<section style="padding-top:150px"><div class="wrap">
- ${head('分期开卷', '秘典目录', '六卷六期。卷〇 免费，卷一至卷五为会员内容，录好一卷开放一卷。')}
+ ${head('分期开卷', '秘典目录', '七卷七期。卷〇 免费，卷一至卷六为会员内容，录好一卷开放一卷。')}
  ${issues(r)}
  <div class="cat">${volumes.map(v => `<a class="row rv" href="${r}juan/${v.slug}/">
   <div class="img" style="background-image:url(${r}img/${v.img}.jpg)"></div>
@@ -262,7 +262,7 @@ for (const v of volumes) {
   page({
     path: 'join', r, active: 'join', title: `入会 · ${site.name}`, desc: '暗岩秘典入会方式：单卷、全卷秘典、秘典亲授。',
     body: `<section style="padding-top:150px"><div class="wrap">
-  ${head('入会方式', '择一而入', '单买一卷，或一次开启全部六卷。全卷每开放一卷涨 ¥${ladder.step}，越早越便宜。')}
+  ${head('入会方式', '择一而入', '单买一卷，或一次开启全部七卷。全卷每开放一卷涨 ¥${ladder.step}，越早越便宜。')}
   ${tiers(r)}
   ${open ? '' : '<div class="notice" id="open">收款通道正在开通，开放当天会在这里和各平台主页同步通知。先去看免费的卷〇吧。</div>'}
   <div class="flow">
@@ -314,7 +314,7 @@ page({ path: 'me', r: '../', active: 'me', data: true, noindex: true, title: `�
   <div class="mehead"><div><div class="kicker">我的秘典</div><h1 id="me-email">……</h1><div class="dim" id="me-dev"></div></div>
    <button class="btn ghost" id="logout" type="button">退出登录</button></div>
   <div class="notice" id="me-pending" hidden>正在确认付款结果……付完款回到这里，几秒到一两分钟内会自动开通。</div>
-  <h3 class="mh">六卷</h3><div class="mvols" id="me-vols"></div>
+  <h3 class="mh">七卷</h3><div class="mvols" id="me-vols"></div>
   <div class="mecols">
    <div><h3 class="mh">订单</h3><ul class="morders" id="me-orders"></ul></div>
    <div>
