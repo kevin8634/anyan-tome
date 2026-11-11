@@ -74,7 +74,7 @@ export const volumes = [
     ],
   },
   {
-    no: 2, cn: '二', slug: '2', title: '铸器：从 Lux3D 到网页', status: 'soon',
+    no: 2, cn: '二', slug: '2', title: '铸器：从 Lux3D 到网页', status: 'open',
     img: 'forge-moment', tagline: '生成 → T 字姿势 → 绑骨 → 压缩 → 入 three.js，一条龙。',
     intro: '暗岩里 240 个模型，没有一个是手工建的。这一卷把整条铸器流水线拆开：提示词怎么写才不出怪东西，模型怎么立正、怎么绑骨、怎么压到网页吃得下，最后在 three.js 里用材质和泛光把它点亮。',
     gains: ['写出稳定出货的 3D 生成提示词', '模型立正、归一、绑骨、配动作', '把模型压到网页能流畅加载的体积'],
