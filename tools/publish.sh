@@ -3,6 +3,7 @@
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd); msg=${1:-"更新站点"}
 node "$root/src/build.mjs" >/dev/null
+(cd "$root" && npm test >/tmp/test.log 2>&1) || { echo "测试未过，停止推送"; tail -20 /tmp/test.log; exit 1; }
 rm -rf /tmp/repo && git clone -q ${SSL_CERT_FILE:+-c http.sslCAInfo="$SSL_CERT_FILE"} https://github.com/kevin8634/anyan-tome.git /tmp/repo
 find /tmp/repo -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 tar -C "$root" --exclude=./node_modules --exclude=./data --exclude=./server/.env --exclude=./.git --exclude=./course --exclude=./keys -cf - . | tar -xf - -C /tmp/repo

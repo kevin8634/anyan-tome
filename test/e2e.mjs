@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+const FULL = JSON.parse((await import('node:fs')).readFileSync(new URL('../docs/prices.json', import.meta.url), 'utf8')).full;
 import assert from 'node:assert/strict';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -86,7 +87,7 @@ try {
   assert.equal((await A('/api/orders', { product: 'full' })).j.order, o.order); ok('30 分钟内重复点击复用同一订单');
 
   // 伪造回调：爱发电那边查不到这笔
-  assert.equal((await hook({ out_trade_no: 'FAKE001', custom_order_id: o.order, status: 2, total_amount: '199.00', plan_id: PLANS.full })).ec, 200);
+  assert.equal((await hook({ out_trade_no: 'FAKE001', custom_order_id: o.order, status: 2, total_amount: FULL, plan_id: PLANS.full })).ec, 200);
   assert.deepEqual((await A('/api/me')).j.vols, []); ok('伪造的回调不会开通（回查不到订单）');
 
   // 金额不对
@@ -95,15 +96,15 @@ try {
   assert.deepEqual((await A('/api/me')).j.vols, []); ok('付款金额不足不会开通');
 
   // 方案不对
-  remoteOrders.push({ out_trade_no: 'T-PLAN', custom_order_id: o.order, status: 2, total_amount: '199.00', show_amount: '199.00', plan_id: 'other-plan' });
+  remoteOrders.push({ out_trade_no: 'T-PLAN', custom_order_id: o.order, status: 2, total_amount: FULL, show_amount: FULL, plan_id: 'other-plan' });
   await hook({ out_trade_no: 'T-PLAN', custom_order_id: o.order });
   assert.deepEqual((await A('/api/me')).j.vols, []); ok('方案对不上不会开通');
 
   // 真付款
-  remoteOrders.push({ out_trade_no: 'T-REAL-1', custom_order_id: o.order, status: 2, total_amount: '199.00', show_amount: '199.00', plan_id: PLANS.full, remark: '' });
+  remoteOrders.push({ out_trade_no: 'T-REAL-1', custom_order_id: o.order, status: 2, total_amount: FULL, show_amount: FULL, plan_id: PLANS.full, remark: '' });
   assert.equal((await hook({ out_trade_no: 'T-REAL-1', custom_order_id: o.order })).ec, 200);
-  me = (await A('/api/me')).j; assert.deepEqual(me.vols, [1, 2, 3, 4, 5]); assert.equal(me.orders[0].status, 'paid');
-  ok('真实付款回调 → 回查通过 → 自动开通卷一至卷五');
+  me = (await A('/api/me')).j; assert.deepEqual(me.vols, [1, 2, 3, 4, 5, 6]); assert.equal(me.orders[0].status, 'paid');
+  ok('真实付款回调 → 回查通过 → 自动开通卷一至卷六');
   await hook({ out_trade_no: 'T-REAL-1', custom_order_id: o.order });
   assert.equal((await A('/api/me')).j.orders.filter(x => x.status === 'paid').length, 1); ok('重复推送幂等，不重复记账');
   assert.equal((await A('/api/orders/status?id=' + o.order)).j.status, 'paid'); ok('订单状态查询');
@@ -159,7 +160,7 @@ try {
   const W = client(); await W('/api/register', { email: 'w@test.cn', password: 'pass-wwww' });
   const pay = (await W('/api/pay')).j; assert.equal(pay.wechat, true); assert.equal(pay.afdian.full, true); ok('付款方式接口：爱发电 + 微信都可用');
   const w1 = (await W('/api/orders', { product: 'full', method: 'wechat' })).j;
-  assert.equal(w1.method, 'wechat'); assert.match(w1.payAmount, /^199\.\d\d$/); assert.notEqual(w1.payAmount, '199.00'); assert.ok(w1.qr);
+  assert.equal(w1.method, 'wechat'); assert.match(w1.payAmount, new RegExp('^'+FULL.split('.')[0]+'\\.\\d\\d$')); assert.notEqual(w1.payAmount, FULL); assert.ok(w1.qr);
   ok(`微信下单给出带角分的金额（¥${w1.payAmount}）和收款码`);
   assert.equal((await W('/api/orders', { product: 'full', method: 'wechat' })).j.payAmount, w1.payAmount); ok('重复点击金额不变');
   const W2 = client(); await W2('/api/register', { email: 'w2@test.cn', password: 'pass-wwww' });
@@ -171,9 +172,9 @@ try {
   assert.equal((await BOSS('/api/me')).j.admin, true);
   const list = (await BOSS('/api/admin/orders')).j.orders; assert.equal(list[0].id, w1.order); ok('后台列出待确认订单，已点付款的排最前');
   assert.ok((await BOSS('/api/admin/confirm', { id: w1.order })).j.ok);
-  assert.deepEqual((await W('/api/me')).j.vols, [1, 2, 3, 4, 5]); assert.equal((await W('/api/orders/status?id=' + w1.order)).j.status, 'paid'); ok('后台确认到账 → 自动开通全卷');
+  assert.deepEqual((await W('/api/me')).j.vols, [1, 2, 3, 4, 5, 6]); assert.equal((await W('/api/orders/status?id=' + w1.order)).j.status, 'paid'); ok('后台确认到账 → 自动开通全卷');
   execFileSync('node', [join(ROOT, 'tools/admin.mjs'), 'confirm', w2.payAmount], { env: process.env });
-  assert.deepEqual((await W2('/api/me')).j.vols, [1, 2, 3, 4, 5]); ok(`命令行按金额确认（confirm ${w2.payAmount}）`);
+  assert.deepEqual((await W2('/api/me')).j.vols, [1, 2, 3, 4, 5, 6]); ok(`命令行按金额确认（confirm ${w2.payAmount}）`);
   const w3 = (await W('/api/orders', { product: 'mentor', method: 'wechat' })).j;
   assert.ok((await BOSS('/api/admin/cancel', { id: w3.order })).j.ok);
   assert.equal((await BOSS('/api/admin/confirm', { id: w3.order })).status, 409); ok('作废的订单不能再确认');

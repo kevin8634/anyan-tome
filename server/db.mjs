@@ -43,7 +43,7 @@ export const log = (kind, ref, body) =>
   db.prepare('INSERT INTO events(kind,ref,body,created) VALUES(?,?,?,?)').run(kind, ref ?? null, body ? JSON.stringify(body) : null, now());
 
 // 产品 → 解锁哪些卷。卷〇 免费，不进权益表
-export const MEMBER_VOLS = [1, 2, 3, 4, 5];
+export const MEMBER_VOLS = [1, 2, 3, 4, 5, 6];
 export function grant(userId, product, vol, source) {
   const vols = product === 'single' ? [vol] : MEMBER_VOLS;
   const st = db.prepare('INSERT OR IGNORE INTO entitlements(user_id,vol,source,created) VALUES(?,?,?,?)');
