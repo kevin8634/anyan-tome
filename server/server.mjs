@@ -157,8 +157,9 @@ const routes = {
     let o = db.prepare("SELECT * FROM orders WHERE user_id=? AND product=? AND IFNULL(vol,-1)=IFNULL(?,-1) AND method=? AND status='pending' AND created>? ORDER BY created DESC").get(u.id, product, v, method, now() - keep);
     if (!o) {
       const id = 'AY' + Date.now().toString(36).toUpperCase() + randomBytes(4).toString('hex').toUpperCase();
-      const payAmount = method === 'wechat' ? uniqueAmount(cfg.prices[product]) : null;
-      db.prepare('INSERT INTO orders(id,user_id,product,vol,amount,method,pay_amount,created) VALUES(?,?,?,?,?,?,?,?)').run(id, u.id, product, v, cfg.prices[product], method, payAmount, now());
+      const price = product === 'single' ? (cfg.prices.vol[v] || cfg.prices.single) : cfg.prices[product];
+      const payAmount = method === 'wechat' ? uniqueAmount(price) : null;
+      db.prepare('INSERT INTO orders(id,user_id,product,vol,amount,method,pay_amount,created) VALUES(?,?,?,?,?,?,?,?)').run(id, u.id, product, v, price, method, payAmount, now());
       o = db.prepare('SELECT * FROM orders WHERE id=?').get(id);
     }
     if (method === 'wechat') return json(res, 200, { ok: true, method, order: o.id, amount: o.amount, payAmount: o.pay_amount, qr: cfg.wechat.qr, payee: cfg.wechat.name, claimed: !!o.claimed });

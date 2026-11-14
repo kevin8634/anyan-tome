@@ -243,8 +243,8 @@ section{position:relative;padding:110px 0}
 .case h3{font-size:28px;letter-spacing:4px;color:#efdcaa;margin-top:10px}
 .case p{color:var(--bone2);margin-top:14px;font-size:16px;line-height:1.9}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;counter-reset:s}
-.step{padding:32px 26px;border:1px solid var(--line2);background:var(--stone);position:relative}
-.step:before{counter-increment:s;content:"0" counter(s);font-size:34px;color:var(--gold);font-weight:700;letter-spacing:2px}
+.step{padding:32px 26px;border:1px solid var(--line2);background:var(--stone);position:relative;counter-increment:s}
+.step:before{content:"0" counter(s);font-size:34px;color:var(--gold);font-weight:700;letter-spacing:2px}
 .step h4{margin-top:10px;font-size:18px;letter-spacing:3px;color:#e6d6aa}
 .step p{margin-top:8px;font-size:15px;color:var(--bone2)}
 .quote{max-width:760px;margin:0 auto;text-align:center;padding:46px;border:1px solid var(--gold2)}

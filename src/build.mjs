@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync, cpSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { site, stats, pricing, volumes, services, faq, prices, ladder } from './data.mjs';
+import { site, stats, pricing, volumes, services, faq, prices, ladder, singleOf } from './data.mjs';
 import { lockAll } from '../tools/lock.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -12,7 +12,7 @@ mkdirSync(OUT, { recursive: true });
 cpSync(join(ROOT, 'static'), OUT, { recursive: true });
 writeFileSync(join(OUT, '.nojekyll'), '');
 const { avail, locked } = await lockAll(ROOT, OUT, volumes);
-writeFileSync(join(OUT, 'prices.json'), JSON.stringify({ single: prices.single.toFixed(2), full: prices.full.toFixed(2), mentor: prices.mentor.toFixed(2) }));
+writeFileSync(join(OUT, 'prices.json'), JSON.stringify({ single: prices.single.toFixed(2), full: prices.full.toFixed(2), mentor: prices.mentor.toFixed(2), vol: Object.fromEntries(Object.entries(prices.vol).map(([k, p]) => [k, p.toFixed(2)])) }));
 
 const NUM = ['壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖', '拾'];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -36,7 +36,7 @@ function page({ path, title, desc, active, body, r, data = false, noindex = fals
 <meta name="tome-root" content="${r}">${noindex ? '\n<meta name="robots" content="noindex">' : ''}
 <script>window.TOME_OPEN=${JSON.stringify(volumes.filter(v => !v.free && v.status === 'open').map(v => v.no))}</script>
 ${data ? `<script>window.TOME=${JSON.stringify({ name: site.name, volumes })}</script>` : ''}
-</head><body data-prices='${JSON.stringify({ single: prices.single, full: prices.full, mentor: prices.mentor })}'>
+</head><body data-prices='${JSON.stringify({ single: prices.single, full: prices.full, mentor: prices.mentor, vol: prices.vol })}'>
 <header class="nav"><div class="wrap">
  <a class="brand" href="${r}"><span class="sigil"><i></i></span><span class="gold">${site.name}</span></a>
  <ul>
@@ -118,7 +118,7 @@ const tiers = (r) => `<div class="prices">${pricing.map(t => `<div class="tier r
 </div></section>
 
 <section style="padding-top:40px"><div class="wrap">
- ${head('分期开卷', '秘典七卷', '一卷就是一期，录好一卷开放一卷。全卷会员包含之后开放的每一期。全卷价每开一卷涨 ¥${ladder.step}，封顶 ¥${ladder.cap}。')}
+ ${head('分期开卷', '秘典七卷', '一卷就是一期，录好一卷开放一卷。全卷会员包含之后开放的每一期。')}
  ${issues(r)}
  <div class="tomes">${volumes.map(v => volCard(v, r)).join('')}</div>
 </div></section>
@@ -194,9 +194,9 @@ for (const v of volumes) {
     ? `<div class="aside rv"><h4>卷〇 · 免费</h4><div class="p">¥0<small>不用登录</small></div>
         <p class="dim" style="margin-top:12px;font-size:15px">看完卷〇，如果这条路你走得通，再往下读。</p>
         <a class="btn" href="${r}juan/1/">看下一卷</a><div class="or">或 <a href="${r}join/">直接开启全卷秘典</a></div></div>`
-    : `<div class="aside rv"><h4>解锁卷${v.cn}</h4><div class="p">¥99<small>/ 本卷</small></div>
+    : `<div class="aside rv"><h4>解锁卷${v.cn}</h4><div class="p">¥${singleOf(v)}<small>/ 本卷</small></div>
         <p class="dim" style="margin-top:12px;font-size:15px">${v.status === 'open' ? '永久可看，含本卷全部附件。' : '本卷筹备中。现在入会，开卷当天即可看。'}</p>
-        ${payBtn('single', '单买本卷', r, 'btn', v.no)}<div class="or">或 <a href="${r}join/">¥${prices.full} ${prices.capped ? '' : '早鸟'}开启全卷</a></div>
+        ${payBtn('single', '单买本卷', r, 'btn', v.no)}<div class="or">或 <a href="${r}join/">¥${prices.full} ${prices.capped ? '' : '首发价'}开启全卷</a></div>
         <form class="unlock"><input name="code" required placeholder="已付款？输入解锁码" autocomplete="off"><button class="btn ghost" type="submit">解锁</button></form></div>`;
   page({
     path: `juan/${v.slug}`, r, active: v.free ? 'free' : 'juan',
@@ -262,7 +262,7 @@ for (const v of volumes) {
   page({
     path: 'join', r, active: 'join', title: `入会 · ${site.name}`, desc: '暗岩秘典入会方式：单卷、全卷秘典、秘典亲授。',
     body: `<section style="padding-top:150px"><div class="wrap">
-  ${head('入会方式', '择一而入', '单买一卷，或一次开启全部七卷。全卷每开放一卷涨 ¥${ladder.step}，越早越便宜。')}
+  ${head('入会方式', '择一而入', `单买一卷，或一次开启全部卷。全卷含之后开放的每一卷，首发期 ¥${prices.full}，之后恢复正价 ¥${ladder.full}。`)}
   ${tiers(r)}
   ${open ? '' : '<div class="notice" id="open">收款通道正在开通，开放当天会在这里和各平台主页同步通知。先去看免费的卷〇吧。</div>'}
   <div class="flow">

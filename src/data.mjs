@@ -6,7 +6,7 @@ export const site = {
   game: '《暗岩传说：深渊回响》',
   // 收款链接：开通爱发电（或其他收款方）后填进来。留空时按钮显示「即将开放」。
   pay: {
-    single: '',   // 单卷 ¥99
+    single: '',   // 单卷
     full: '',     // 全卷秘典
     mentor: '',   // 秘典 · 亲授
   },
@@ -30,16 +30,16 @@ export const stats = [
 
 export const pricing = [
   {
-    id: 'single', name: '单卷', price: '¥99', unit: '/ 卷', was: '',
-    perks: ['任选一卷，永久可看', '该卷全部讲义、脚本与附件', '之后补全卷可抵扣已付'],
+    id: 'single', name: '单卷', price: '', unit: '/ 卷', was: '',
+    perks: ['任选一卷，永久可看', '该卷全部讲义、脚本与附件', '实战卷单买 ¥599', '之后补全卷可抵扣已付'],
   },
   {
-    id: 'full', name: '全卷秘典', price: '', unit: '/ 全部', was: '', ribbon: '早鸟阶梯价', main: true,
-    perks: ['卷一至卷六，开一卷看一卷', '模板库与后续更新', '会员答疑区'],
+    id: 'full', name: '全卷秘典', price: '', unit: '/ 全部', was: '', ribbon: '首发价', main: true,
+    perks: ['已开放的全部卷，含实战卷', '后续新卷免费看，含黑客松实战卷', '模板库与后续更新', '会员答疑区'],
   },
   {
     id: 'mentor', name: '秘典 · 亲授', price: '', unit: '/ 全部', was: '',
-    perks: ['全卷秘典全部权益', '一次 30 分钟项目诊断', '新卷抢先看'],
+    perks: ['全卷秘典全部权益', '4 次 1 对 1 线上辅导', '作品点评，一路带到上线', '亲授小群 · 每期限量'],
   },
 ];
 
@@ -130,7 +130,7 @@ export const volumes = [
     ],
   },
   {
-    no: 6, cn: '六', slug: '6', title: '实战：从零做一款 roguelite', status: 'open',
+    no: 6, cn: '六', slug: '6', title: '实战：从零做一款 roguelite', status: 'open', price: 599,
     img: 'portal', tagline: '跟着做完一款能玩、能上线的 2D 地牢小游戏，学完手里就有作品。',
     intro: '前几卷是拆暗岩，这一卷是从一张白纸开始。我们用前面学到的方法，带着 AI 从零做一款俯视角 2D roguelite：随机地牢、清房三选一强化、首领战，一个 html 就能在浏览器里玩。每一节结束你都有一个能玩的版本，最后上线、发链接。换个题材、换套规则，就是你自己的作品。全程录屏：大陆线用 Trae 国内版完整演示，国际线（Codex）单独补录工具不同的几步。',
     gains: ['一款能玩、能分享链接的完整小游戏', '从雏形到上线的完整开发顺序', '换题材、换规则，做出自己的作品'],
@@ -159,17 +159,17 @@ export const faq = [
   { q: '要准备什么工具？', a: '一台能上网的电脑、一个 AI 编程工具。3D 生成工具按卷二的说明开通，费用在课里写明，可以先不买。' },
   { q: '买了能看多久？', a: '买下的卷永久可看，后续更新免费。' },
   { q: '能退款吗？', a: '购买 7 天内联系作者，可以全额退款，退款后解锁码同时停用。' },
-  { q: '为什么课程分卷、分期开放？', a: '一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。现在买全卷，后续开放的每一卷都包含在内。全卷价每开放一卷涨 ¥50，涨到 ¥299 为止，越早买越便宜。' },
+  { q: '为什么课程分卷、分期开放？', a: '一卷就是一期，录好一卷开放一卷，保证每一卷都是认真打磨过的。现在买全卷，后续开放的每一卷都包含在内，包括之后的黑客松实战卷。' },
 ];
 
-// 早鸟阶梯价：每开放一卷付费卷，全卷涨 ladder.step，封顶 ladder.cap；亲授 = 全卷 + mentorPlus
-// 改这里或改卷的 status 后重新构建，价格会写进页面和 docs/prices.json（服务器以它为准，.env 的 PRICE_* 可覆盖）
-export const ladder = { start: 199, step: 50, cap: 299, mentorPlus: 100, single: 99 };
-const openedPaid = volumes.filter(v => !v.free && v.status === 'open').length;
-const fullNow = Math.min(ladder.start + ladder.step * openedPaid, ladder.cap);
-const fullNext = Math.min(fullNow + ladder.step, ladder.cap);
-export const prices = { single: ladder.single, full: fullNow, mentor: fullNow + ladder.mentorPlus, fullNext, capped: fullNow >= ladder.cap };
+// 定价（2026-11-14 Rhett 定）：单卷 ¥299，实战卷单买看卷的 price；全卷正价 ¥1999，首发期按 launch 收；亲授 ¥6980
+// 改这里后重新构建，价格会写进页面和 docs/prices.json（服务器以它为准，.env 的 PRICE_* 可覆盖）
+export const ladder = { single: 299, full: 1999, launch: 1499, mentor: 6980 };
+const fullNow = ladder.launch || ladder.full;
+export const singleOf = v => v.price || ladder.single;
+export const volPrices = Object.fromEntries(volumes.filter(v => v.price).map(v => [v.no, v.price]));
+export const prices = { single: ladder.single, full: fullNow, mentor: ladder.mentor, vol: volPrices, capped: fullNow >= ladder.full };
 for (const t of pricing) t.price = '¥' + prices[t.id];
 Object.assign(pricing.find(t => t.id === 'full'), prices.capped
   ? { ribbon: '', was: '' }
-  : { was: `下一卷开放后 ¥${fullNext} · 正价 ¥${ladder.cap}` });
+  : { was: `正价 ¥${ladder.full}` });

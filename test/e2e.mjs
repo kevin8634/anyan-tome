@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-const FULL = JSON.parse((await import('node:fs')).readFileSync(new URL('../docs/prices.json', import.meta.url), 'utf8')).full;
+const PJ = JSON.parse((await import('node:fs')).readFileSync(new URL('../docs/prices.json', import.meta.url), 'utf8')), FULL = PJ.full, SINGLE = PJ.single;
 import assert from 'node:assert/strict';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -113,7 +113,9 @@ try {
   const B = client();
   await B('/api/register', { email: 'b@test.cn', password: 'pass-5678' });
   const ob = (await B('/api/orders', { product: 'single', vol: 2 })).j; assert.ok(ob.ok);
-  remoteOrders.push({ out_trade_no: 'T-REAL-2', custom_order_id: ob.order, status: 2, total_amount: '99.00', show_amount: '99.00', plan_id: PLANS.single });
+  remoteOrders.push({ out_trade_no: 'T-REAL-2', custom_order_id: ob.order, status: 2, total_amount: SINGLE, show_amount: SINGLE, plan_id: PLANS.single });
+  assert.equal(ob.amount, SINGLE); ok('普通卷单买按单卷价下单');
+  if (PJ.vol?.['6']) { const o6 = (await B('/api/orders', { product: 'single', vol: 6 })).j; assert.ok(o6.ok); assert.equal(o6.amount, PJ.vol['6']); ok('实战卷单买按实战卷价下单'); }
   assert.equal((await B('/api/orders/status?id=' + ob.order)).j.status, 'paid');
   assert.deepEqual((await B('/api/me')).j.vols, [2]); ok('没收到回调时，查询订单会主动对账补开通（单卷）');
 
